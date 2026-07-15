@@ -37,13 +37,39 @@ void textcolor(int color) {
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
 }
 
-int setup(int x[], int y[]){
+int setup(int onda,int x[], int y[], char matriz[26][50]){
+    srand(time(NULL));
+    HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+        CONSOLE_SCREEN_BUFFER_INFO info;
+        GetConsoleScreenBufferInfo(h, &info);
+    for(int i=0; i<26; i++){
+        strcpy(matriz[i],"#");
+        x[i]=rand()%info.dwSize.X;
+        y[i]=rand()/*não sei como colocar isso*/;
+        if (x[i]){
 
+        }
+        for (int i=0; i<3; i++){
+        gotoxy(x,y);
+        textcolor(VERMELHO_ESCURO);
+        printf("ONDA %d", onda);
+        Sleep(500);
+        gotoxy(x,y);
+        textcolor(VERMELHO_CLARO);
+        printf("onda %d", onda);
+        Sleep(500);
+        }
+        textcolor(PADRAO);
+            gotoxy(x,y);
+            printf("       ");
+    }
 }
 
 int main() {
     srand(time(NULL));
-    int onda= 1;
+    char input;
+    int alvo=0; int letra=1;
+    int onda= 1, timer=0;
     int coordX[26];
     int coordY[26];
     char palavras[26][50];
@@ -60,34 +86,46 @@ int main() {
         GetConsoleScreenBufferInfo(h, &info);
         int x= (info.dwSize.X)/2; 
         int y =(info.dwSize.Y)/2;
-    setup(coordX, coordY);
-    for (int i=0; i<3; i++){
+    setup(onda, coordX, coordY, palavras);
+        while (1){
+            int tempo= clock();
+            tempo=tempo/CLOCKS_PER_SEC;
+            // função de esclher palavras e coloca-las no char
+            textcolor(PADRAO);
             gotoxy(x,y);
-            textcolor(VERMELHO_CLARO);
-            printf("ONDA %d", onda);
-            Sleep(500);
-            gotoxy(x,y);
-            textcolor(VERMELHO_CLARO);
-            printf("onda %d", onda);
-            Sleep(500);
-    }
-        while (1)
-    {
-        int tempo= clock(), timer=0;
-        tempo=tempo/CLOCKS_PER_SEC;
-        // função de esclher palavras e coloca-las no char
-        textcolor(PADRAO);
-        gotoxy(x,y);
-        printf("                                     ");
-        if((tempo-timer)> 1){
-        for (controle; controle<26; controle++){
-            if (gotoxy(coordX[controle], coordY[controle])== 0){
-                // if pra verificar se a palavra a ser atualizada é a palavra que o jogador está digitando
-                printf("%s", palavras[controle]);
-                } 
-            }   
-        }  
-    }
-    
-    
+            printf("                                     ");
+            if((tempo-timer)> 1){
+            for (controle; controle<26; controle++){
+                timer= tempo;
+                if (gotoxy(coordX[controle], coordY[controle])== 0){
+                    if (alvo==controle){textcolor(AMARELO_CLARO);}
+                    printf("%s", palavras[controle]);
+                    textcolor(PADRAO);} 
+                    coordY[controle]++;
+                }   
+            }  
+            if(kbhit()){
+                input=getch();
+                if (alvo!=-1){
+                    controle=0;
+                    while (palavras[controle][0]!='#'){
+                    if (input==palavras[controle][0]){
+                        palavras[controle][0]= ' ';
+                        alvo= controle;
+                        break;
+                    }
+                    controle++;
+                }
+                }else {
+                    if (input==palavras[alvo][letra]){
+                        palavras[alvo][letra]=' ';
+                        letra++;
+                        if (letra<strlen(palavras[alvo])){
+                            alvo=-1;
+                        }
+                    }
+                }
+                
+            }
+    }    
 }
