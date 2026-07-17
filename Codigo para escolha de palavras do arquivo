@@ -1,0 +1,76 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+
+
+void sorteio_palavras() {
+    FILE *dicio;
+    dicio = fopen("dicionario.txt", "r");
+
+    int count = 0;
+    int num;
+    int c;
+
+    if (dicio == NULL) {
+        return;
+    }
+
+    while ((c = fgetc(dicio)) != EOF) {
+        if (c == '\n') {
+            count++;
+        }
+    }
+    count++;
+
+    rewind(dicio);
+
+    char string[count][100];
+    int indice;
+    int verificar_repetido[count];
+    int z = 1;
+
+    for (int i = 0; i < count; i++) {
+        verificar_repetido[i] = count + 1;
+    }
+
+    int i = 0;
+    while (fgets(string[i], sizeof(string[i]), dicio) != NULL) {
+        i++;
+    }
+
+    srand(time(NULL));
+
+    indice = rand() % count;
+    verificar_repetido[0] = indice;
+    printf("%s", string[indice]);
+
+    while (z < count) {
+
+        indice = rand() % count;
+
+        for (int i = 0; i < z; i++) {
+
+            if (indice == verificar_repetido[i]) {
+                indice = rand() % count;
+                i = -1;      
+            }
+
+            else if (i == z - 1) {
+                verificar_repetido[z] = indice;
+                z++;
+                printf("%s", string[indice]);
+            }
+        }
+    }
+
+    fclose(dicio);
+}
+
+int main()
+ {
+    sorteio_palavras();
+
+
+    return 0;
+}
