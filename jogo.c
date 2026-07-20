@@ -113,7 +113,7 @@ int main() {
     char input;
     int alvo=0; int letra=1; int score=0; int vidas=3;
     char palavras[26][50];
-    unsigned onda= 1, timer=0;
+    unsigned onda= 1, timer=0;unsigned tempo;
     int coordX[26];
     int coordY[26];
     int controle=0;
@@ -131,14 +131,18 @@ int main() {
         int x= (info.dwSize.X)/2; 
         int y =(info.dwSize.Y)/2;
     placar(1, score, onda, vidas);
+    while(vidas>0){
+        setup(onda, coordX, coordY, palavras, x, y);
+        placar(0, score, onda,vidas);
+        tempo= clock();
+        tempo=tempo/CLOCKS_PER_SEC;
         while (1){
             placar(0, score, onda, vidas);
-            unsigned tempo= clock();
+            tempo= clock();
             tempo=tempo/CLOCKS_PER_SEC;
             setup(onda, coordX, coordY, palavras, x, y);
             //display
             if((tempo-timer)> 1){
-                
             for (controle=0; controle<26; controle++){
                 timer= tempo;
                 if(coordY[controle]<info.dwSize.Y-3){
@@ -176,10 +180,22 @@ int main() {
                             alvo=-1;
                             letra=1;
                             score += (10*strlen(palavras[alvo]));
+                            for (int i=0; i<26; i++){
+                                int cont=0;
+                                if (palavras[i][0]== ' ' || palavras[i][0]=='#' ){
+                                    cont++;
+                                }if (cont==25){
+                                alvo=-2;}
+                            }
                         }
                     }
                 }
                 
             }
+        if (alvo=-2){
+            onda++;
+            break;
+        }
+        }
     }
 }
