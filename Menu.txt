@@ -2,6 +2,7 @@
 #include <locale.h>
 #include <windows.h>
 #include <stdlib.h>
+#include <conio.h>
 
 int main() {
 SetConsoleOutputCP(65001);
@@ -21,7 +22,7 @@ printf(
            "RANK  - 2\n"
            "SAIR  - 3\n"
            );
-    scanf("%d", &opcao);
+    if(kbhit()){opcao=getch()}
 switch (opcao){
 
    case 1:

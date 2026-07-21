@@ -21,6 +21,9 @@
 #define ROSA_MAGENTA 13
 #define AMARELO_CLARO 14 
 #define BRANCO 15
+//legenda do vetor dificuldade
+#define quantidade 0
+#define intervalo 1
 
 // A função gotoxy serve para posicionar o cursor do terminal na coluna x e linha y permitindo mudar o local onde os printf vão ocorrer
 int gotoxy(int x, int y) {
@@ -41,14 +44,25 @@ void setup(int onda,int x[], int y[], char matriz[26][50], int meiox, int meioy)
     HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
         CONSOLE_SCREEN_BUFFER_INFO info;
         GetConsoleScreenBufferInfo(h, &info);
-    for(int i=0; i<26; i++){
+        for(int i=0; i<26; i++){
         strcpy(matriz[i],"#");
+        //colocar função de escolher palavra não é um erro notebook lm
+        y[i]=-(rand()%10);
         x[i]=rand()%info.dwSize.X;
-        y[i]=rand()/*não sei como colocar isso*/;
-        if (x[i]){
+        for (int j=0; j<i;j++){
+            if(y[i] == y[j] && x[i] < (x[j] + strlen(matriz[j]) + 1) && x[j] < (x[i] + strlen(matriz[i]) + 1)){
+                //há colizão e o programa tenta resolver
+                while (y[i] == y[j] && x[i] < (x[j] + strlen(matriz[j]) + 1) && x[j] < (x[i] + strlen(matriz[i]) + 1) ){
+                    if(x[i]<=0){
+                        x[i]--;
+                    }else{y[i]--;x[i]=info.dwSize.X-strlen(matriz[i]);j=-1;}
+                }
+                
+            }
+        }
+        
 
         }
-    }
 
         for (int i=0; i<3; i++){
         gotoxy(meiox, meioy);
@@ -113,7 +127,8 @@ int main() {
     char input;
     int alvo=0; int letra=1; int score=0; int vidas=3;
     char palavras[26][50];
-    unsigned onda= 1, timer=0;unsigned tempo;
+    unsigned onda= 1, timer=0; 
+    unsigned tempo;
     int coordX[26];
     int coordY[26];
     int controle=0;
@@ -146,8 +161,10 @@ int main() {
             for (controle=0; controle<26; controle++){
                 timer= tempo;
                 if(coordY[controle]<info.dwSize.Y-3){
-                    if (gotoxy(coordX[controle], coordY[controle])== 0){
+                    if (gotoxy(coordX[controle], coordY[controle]-1)== 0){
                         if (alvo==controle){textcolor(AMARELO_CLARO);}
+                        for (int i=0; i<strlen(palavras[controle]); i++){printf(" ");}
+                        gotoxy(coordX[controle], coordY[controle]);
                         printf("%s", palavras[controle]);
                         textcolor(PADRAO);} 
                     coordY[controle]++;
@@ -163,6 +180,9 @@ int main() {
             if(kbhit()){
                 input=getch();
                 if (alvo!=-1){
+                    if (input == 27) {
+                        //tela de pause
+                    }
                     controle=0;
                     while (palavras[controle][0]!='#'){
                     if (input==palavras[controle][0]){
@@ -195,7 +215,9 @@ int main() {
         if (alvo=-2){
             onda++;
             break;
-        }
-        }
+            }
+        }if (alvo=-3){
+            break;
+            }
     }
 }
