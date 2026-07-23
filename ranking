@@ -1,0 +1,53 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX 100
+
+typedef struct {
+    char nome[50];
+    int pontuacao;
+} Jogador;
+
+void cadastrarJogador(Jogador jogadores[], int *quantidade);
+void ranquear(Jogador jogadores[], int quantidade);
+void mostrarRanking(Jogador jogadores[], int quantidade);
+
+int main() {
+    Jogador jogadores[MAX];
+    int quantidade = 0;
+
+    cadastrarJogador(jogadores, &quantidade);
+    ranquear(jogadores, quantidade);
+    mostrarRanking(jogadores, quantidade);
+
+    return 0;
+}
+
+void cadastrarJogador(Jogador jogadores[], int *quantidade) {
+    printf("Nome: ");
+    scanf(" %[^\n]", jogadores[*quantidade].nome);
+    printf("Pontuação: ");
+    scanf("%d", &jogadores[*quantidade].pontuacao);
+    (*quantidade)++;
+
+}
+
+void ranquear(Jogador jogadores[], int quantidade) {
+    Jogador aux; for (int i = 0; i < quantidade - 1; i++) {
+        for (int j = i + 1; j < quantidade; j++) {
+                if (jogadores[j].pontuacao > jogadores[i].pontuacao) {
+                    aux = jogadores[i];
+        jogadores[i] = jogadores[j];
+        jogadores[j] = aux;
+        }
+        }
+    }
+
+}
+
+void mostrarRanking(Jogador jogadores[], int quantidade) {
+printf("\n=== RANKING ===\n");
+for (int i = 0; i < quantidade; i++) {
+        printf("%dº - %s : %d pontos\n", i + 1, jogadores[i].nome, jogadores[i].pontuacao);
+}
+}
