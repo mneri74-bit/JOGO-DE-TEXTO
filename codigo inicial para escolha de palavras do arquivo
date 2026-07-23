@@ -1,76 +1,53 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-
-
-
-void sorteio_palavras() {
-    FILE *dicio;
-    dicio = fopen("dicionario.txt", "r");
-
-    int count = 0;
-    int num;
-    int c;
-
+void carregar_palavras(char matriz[26][50]) {
+    FILE *dicio = fopen("dicionario.txt", "r");
+    
     if (dicio == NULL) {
+        // Fallback caso não ache o arquivo
+        for (int i = 0; i < 26; i++) {
+            strcpy(matriz[i], "erro");
+        }
         return;
     }
 
-    while ((c = fgetc(dicio)) != EOF) {
-        if (c == '\n') {
-            count++;
-        }
+    int count = 0;
+    char buffer[100];
+    
+    // Contar as palavras
+    while (fgets(buffer, sizeof(buffer), dicio) != NULL) {
+        count++;
     }
-    count++;
 
     rewind(dicio);
+    char dicionario_completo[count][50];
 
-    char string[count][100];
-    int indice;
-    int verificar_repetido[count];
-    int z = 1;
-
-    for (int i = 0; i < count; i++) {
-        verificar_repetido[i] = count + 1;
-    }
-
+    // Ler todas as palavras para a memória e remover o '\n'
     int i = 0;
-    while (fgets(string[i], sizeof(string[i]), dicio) != NULL) {
+    while (fgets(dicionario_completo[i], 50, dicio) != NULL) {
+        dicionario_completo[i][strcspn(dicionario_completo[i], "\n")] = '\0'; // Remove o \n
         i++;
     }
+    fclose(dicio);
 
-    srand(time(NULL));
+    // Sorteio sem repetir usando a lógica do seu Arquivo 2
+    int verificar_repetido[26];
+    for (int k = 0; k < 26; k++) verificar_repetido[k] = -1;
 
-    indice = rand() % count;
-    verificar_repetido[0] = indice;
-    printf("%s", string[indice]);
-
-    while (z < count) {
-
-        indice = rand() % count;
-
-        for (int i = 0; i < z; i++) {
-
-            if (indice == verificar_repetido[i]) {
-                indice = rand() % count;
-                i = -1;      
-            }
-
-            else if (i == z - 1) {
-                verificar_repetido[z] = indice;
-                z++;
-                printf("%s", string[indice]);
+    int z = 0;
+    while (z < 26) {
+        int indice = rand() % count; // Sorteia uma linha do arquivo
+        int repetido = 0;
+        
+        for (int j = 0; j < z; j++) {
+            if (indice == verificar_repetido[j]) {
+                repetido = 1;
+                break;
             }
         }
+
+        if (!repetido) {
+            verificar_repetido[z] = indice;
+            strcpy(matriz[z], dicionario_completo[indice]);
+            z++;
+        }
     }
-
-    fclose(dicio);
-}
-
-int main()
- {
-    sorteio_palavras();
-
-
-    return 0;
 }
