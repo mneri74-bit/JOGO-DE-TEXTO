@@ -4,6 +4,7 @@
 #include <windows.h>
 #include <time.h>
 #include <string.h>
+#include "dicionario.h"
 // legendas de cores pra facilitar minha vida
 #define PRETO 0
 #define AZUL_ESCURO 1
@@ -21,9 +22,7 @@
 #define ROSA_MAGENTA 13
 #define AMARELO_CLARO 14 
 #define BRANCO 15
-//legenda do vetor dificuldade
-#define quantidade 0
-#define intervalo 1
+
 
 // A função gotoxy serve para posicionar o cursor do terminal na coluna x e linha y permitindo mudar o local onde os printf vão ocorrer
 int gotoxy(int x, int y) {
@@ -47,22 +46,21 @@ void setup(int onda,int x[], int y[], char matriz[26][50], int meiox, int meioy)
         for(int i=0; i<26; i++){
         strcpy(matriz[i],"#");
         //colocar função de escolher palavra não é um erro notebook lm
-        y[i]=-(rand()%10);
-        x[i]=rand()%info.dwSize.X;
-        for (int j=0; j<i;j++){
-            if(y[i] == y[j] && x[i] < (x[j] + strlen(matriz[j]) + 1) && x[j] < (x[i] + strlen(matriz[i]) + 1)){
-                //há colizão e o programa tenta resolver
-                while (y[i] == y[j] && x[i] < (x[j] + strlen(matriz[j]) + 1) && x[j] < (x[i] + strlen(matriz[i]) + 1) ){
-                    if(x[i]<=0){
-                        x[i]--;
-                    }else{y[i]--;x[i]=info.dwSize.X-strlen(matriz[i]);j=-1;}
+        int colisao;
+        do {
+        colisao = 0; 
+        y[i] = -(rand() % 10);
+        x[i] = rand() % (info.dwSize.X - strlen(matriz[i]) - 1);
+        // Verifica se a nova posição bate em alguém que já foi colocado
+        for (int j = 0; j < i; j++) {
+            if (y[i] == y[j] && x[i] < (x[j] + strlen(matriz[j]) + 1) && x[j] < (x[i] + strlen(matriz[i]) + 1)) {
+                colisao = 1; // Ops, bateu! Precisa sortear de novo
+                break; 
                 }
-                
             }
+            } while (colisao); 
         }
         
-
-        }
 
         for (int i=0; i<3; i++){
         gotoxy(meiox, meioy);
@@ -120,15 +118,19 @@ void dano(int alvo, int x[], int y[], int score, int onda, int vidas, char palav
     placar(1, score, onda, vidas);
 }
 
-
+double intervalo(int onda){
+    double pato= (double)26-onda/39;
+    if (pato<0.25){return 0.26;}
+    return pato;
+}
 
 int main() {
     srand(time(NULL));
     char input;
     int alvo=0; int letra=1; int score=0; int vidas=3;
     char palavras[26][50];
-    unsigned onda= 1, timer=0; 
-    unsigned tempo;
+    unsigned onda= 1; 
+    double tempo; double timer =0;
     int coordX[26];
     int coordY[26];
     int controle=0;
@@ -149,15 +151,14 @@ int main() {
     while(vidas>0){
         setup(onda, coordX, coordY, palavras, x, y);
         placar(0, score, onda,vidas);
-        tempo= clock();
-        tempo=tempo/CLOCKS_PER_SEC;
+        tempo= (double)clock() / CLOCKS_PER_SEC;
         while (1){
             placar(0, score, onda, vidas);
-            tempo= clock();
+            tempo=(double)clock();
             tempo=tempo/CLOCKS_PER_SEC;
             setup(onda, coordX, coordY, palavras, x, y);
             //display
-            if((tempo-timer)> 1){
+            if((tempo-timer)> intervalo(onda)){
             for (controle=0; controle<26; controle++){
                 timer= tempo;
                 if(coordY[controle]<info.dwSize.Y-3){

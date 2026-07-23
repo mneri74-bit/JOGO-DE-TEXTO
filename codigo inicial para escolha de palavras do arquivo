@@ -4,11 +4,14 @@
 
 
 
-void sorteio_palavras() {
+void sorteio_palavras(int inicio, char string[][50], int verificar_repetido[] ) {
+    int z = 1;
+    int indice;
+    static int count = 0;
     FILE *dicio;
+    if (inicio){
     dicio = fopen("dicionario.txt", "r");
 
-    int count = 0;
     int num;
     int c;
 
@@ -25,10 +28,10 @@ void sorteio_palavras() {
 
     rewind(dicio);
 
-    char string[count][100];
-    int indice;
+    char string[count][50];
+  
     int verificar_repetido[count];
-    int z = 1;
+    
 
     for (int i = 0; i < count; i++) {
         verificar_repetido[i] = count + 1;
@@ -38,7 +41,7 @@ void sorteio_palavras() {
     while (fgets(string[i], sizeof(string[i]), dicio) != NULL) {
         i++;
     }
-
+    }
     srand(time(NULL));
 
     indice = rand() % count;
@@ -63,13 +66,12 @@ void sorteio_palavras() {
             }
         }
     }
-
-    fclose(dicio);
+    if (inicio){
+    fclose(dicio);}
 }
 
 int main()
  {
-    sorteio_palavras();
 
 
     return 0;

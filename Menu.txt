@@ -6,7 +6,7 @@
 
 int main() {
 SetConsoleOutputCP(65001);
-int opcao;
+char opcao;
 while(1){
 
 
@@ -22,7 +22,7 @@ printf(
            "RANK  - 2\n"
            "SAIR  - 3\n"
            );
-    if(kbhit()){opcao=getch()}
+    opcao=getch()
 switch (opcao){
 
    case 1:
