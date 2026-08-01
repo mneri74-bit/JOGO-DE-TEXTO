@@ -1,0 +1,350 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <conio.h>
+#include <windows.h>
+#include <time.h>
+#include <string.h>
+
+// Legendas de cores
+#define PRETO 0
+#define AZUL_ESCURO 1
+#define VERDE_ESCURO 2
+#define CIANO_ESCURO 3
+#define VERMELHO_ESCURO 4
+#define ROXO 5
+#define AMARELO_ESCURO 6
+#define PADRAO 7
+#define CINZA_ESCURO 8
+#define AZUL_CLARO 9
+#define VERDE_CLARO 10
+#define CIANO_CLARO 11
+#define VERMELHO_CLARO 12
+#define ROSA_MAGENTA 13
+#define AMARELO_CLARO 14
+#define BRANCO 15
+
+// Dicionário
+static const char *palavras_dicio[] = {
+    "abobora", "acontecimento", "aeronave", "arquitetura", "astronauta",
+    "borboleta", "civilizacao", "computador", "conhecimento", "constelacao",
+    "descoberta", "eletricidade", "engenharia", "experiencia", "felicidade",
+    "gravidade", "imaginacao", "independencia", "labirintico", "matematica"
+};
+#define NUM_PALAVRAS (sizeof(palavras_dicio) / sizeof(palavras_dicio[0]))
+
+// Função para mover o cursor na tela
+int gotoxy(int x, int y) {
+    if(x >= 0 && y >= 0){
+        COORD coord;
+        coord.X = x;
+        coord.Y = y;
+        SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+        return 0;
+    }
+    return 1;
+}
+
+void textcolor(int color) {
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+}
+
+// Sorteia as palavras sem repetição
+void sorteio_palavras(int onda, char palavras[][50]) {
+    int indice;
+    int usado[NUM_PALAVRAS] = {0};
+
+    // Limite de segurança para não travar o jogo se a onda for maior que o dicionário
+    int quantidade = onda;
+    if (quantidade > NUM_PALAVRAS) {
+        quantidade = NUM_PALAVRAS;
+    }
+
+    for (int i = 0; i < quantidade; i++) {
+        do {
+            indice = rand() % NUM_PALAVRAS;
+        } while (usado[indice]);
+
+        usado[indice] = 1;
+        strcpy(palavras[i], palavras_dicio[indice]);
+    }
+}
+
+// Configura o início da onda
+void setup(int onda, int x[], int y[], char matriz[26][50], int meiox, int meioy) {
+    HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO info;
+    GetConsoleScreenBufferInfo(h, &info);
+
+    // Limpa a tela para a nova onda
+    system("cls");
+
+    // Limpa a matriz inteira primeiro
+    for(int i = 0; i < 26; i++){
+        strcpy(matriz[i], "");
+    }
+
+    // Sorteia as palavras da onda
+    sorteio_palavras(onda, matriz);
+
+    int quantidade;
+
+if (onda > NUM_PALAVRAS) {
+    quantidade = NUM_PALAVRAS; // Trava no limite do dicionário
+} else {
+    quantidade = onda; // Usa o número da onda normalmente
+}
+
+    // Define posições aleatórias
+    for(int i = 0; i < quantidade; i++) {
+        int colisao;
+        do {
+            colisao = 0;
+            y[i] = -(rand() % 10); // Começam fora da tela, em cima
+            x[i] = rand() % (info.dwSize.X - strlen(matriz[i]) - 1);
+
+            for (int j = 0; j < i; j++) {
+                if (y[i] == y[j] && x[i] < (x[j] + strlen(matriz[j]) + 1) && x[j] < (x[i] + strlen(matriz[i]) + 1)) {
+                    colisao = 1;
+                    break;
+                }
+            }
+        } while (colisao);
+    }
+
+    // Animação de Nova Onda
+    for (int i = 0; i < 3; i++) {
+        gotoxy(meiox - 3, meioy);
+        textcolor(VERMELHO_ESCURO);
+        printf("ONDA %d", onda);
+        Sleep(400);
+
+        gotoxy(meiox - 3, meioy);
+        textcolor(VERMELHO_CLARO);
+        printf("onda %d", onda);
+        Sleep(400);
+    }
+    textcolor(PADRAO);
+    gotoxy(meiox - 3, meioy);
+    printf("       "); // Apaga o texto da onda
+}
+
+void placar(int display, int score, int onda, int vidas) {
+    HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO info;
+    GetConsoleScreenBufferInfo(h, &info);
+
+    gotoxy(0, info.dwSize.Y - 3);
+    textcolor(VERMELHO_CLARO);
+
+    if (display) {
+        for (int i = 0; i < info.dwSize.X; i++) {
+            printf("#");
+        }
+    }
+
+    gotoxy(0, info.dwSize.Y - 2);
+    printf("score: %d     ", score); // Espaços extras para limpar rastros antigos
+
+    gotoxy(info.dwSize.X / 2 - 4, info.dwSize.Y - 2);
+    printf("onda %d  ", onda);
+
+    gotoxy(info.dwSize.X - 15, info.dwSize.Y - 2);
+    printf("vidas");
+
+    gotoxy(info.dwSize.X - 15, info.dwSize.Y - 1);
+    for (int i = 0; i < 3; i++) {
+        if(i < vidas) printf("<3 ");
+        else printf("   "); // Apaga corações perdidos
+    }
+    textcolor(PADRAO);
+}
+
+void dano(int alvo, int x[], int y[], int score, int onda, int vidas, char palavras[26][50]) {
+    // Pisca a tela em vermelho
+    for (int i = 0; i < 2; i++) {
+        system("color 44");
+        Sleep(100);
+        system("color 07"); // Volta ao normal
+        Sleep(100);
+    }
+    system("color 07");
+
+    system("cls"); // Força atualização da tela
+
+    // Redesenha as palavras restantes
+    for (int controle = 0; controle < onda; controle++) {
+        if(strlen(palavras[controle]) > 0 && y[controle] >= 0){
+            gotoxy(x[controle], y[controle]);
+            if (alvo == controle) { textcolor(AMARELO_CLARO); }
+            printf("%s", palavras[controle]);
+            textcolor(PADRAO);
+        }
+    }
+    placar(1, score, onda, vidas);
+}
+
+// Controla a velocidade das palavras. Quanto menor o retorno, mais rápido.
+double intervalo(int onda) {
+    double velocidade = 1.0 - (onda * 0.05); // Começa lento e acelera
+    if (velocidade < 0.15) { return 0.15; }  // Limite máximo de velocidade
+    return velocidade;
+}
+
+int main() {
+    srand(time(NULL));
+    char input;
+    int alvo = -1; // -1 significa "Nenhum alvo selecionado"
+    int letra = 0; // Começa da letra 0
+    int score = 0;
+    int vidas = 3;
+    char palavras[26][50];
+    unsigned onda = 1;
+    double tempo;
+    double timer = 0;
+    int coordX[26];
+    int coordY[26];
+    int controle = 0;
+
+    HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO info;
+    GetConsoleScreenBufferInfo(h, &info);
+    int x = (info.dwSize.X) / 2;
+    int y = (info.dwSize.Y) / 2;
+
+    system("cls");
+
+    while(vidas > 0) {
+        setup(onda, coordX, coordY, palavras, x, y);
+        placar(1, score, onda, vidas);
+
+        tempo = (double)clock() / CLOCKS_PER_SEC;
+        timer = tempo;
+
+        int quantidade = (onda > NUM_PALAVRAS) ? NUM_PALAVRAS : onda;
+
+        while (1) {
+            placar(0, score, onda, vidas);
+            tempo = (double)clock() / CLOCKS_PER_SEC;
+
+            // LÓGICA DE QUEDA DAS PALAVRAS
+            if ((tempo - timer) > intervalo(onda)) {
+                timer = tempo;
+
+                for (controle = 0; controle < quantidade; controle++) {
+                    if (strlen(palavras[controle]) == 0) continue; // Pula palavra destruída
+
+                    if (coordY[controle] < info.dwSize.Y - 3) {
+                        // Apaga a palavra na posição antiga
+                        if(coordY[controle] >= 0){
+                            gotoxy(coordX[controle], coordY[controle]);
+                            for (int i = 0; i < strlen(palavras[controle]); i++) { printf(" "); }
+                        }
+
+                        coordY[controle]++; // Move para baixo
+
+                        // Desenha a palavra na nova posição
+                        if(coordY[controle] >= 0 && coordY[controle] < info.dwSize.Y - 3){
+                            gotoxy(coordX[controle], coordY[controle]);
+                            if (alvo == controle) { textcolor(AMARELO_CLARO); }
+                            printf("%s", palavras[controle]);
+                            textcolor(PADRAO);
+                        }
+                    } else {
+                        // A palavra bateu no chão
+                        vidas--;
+                        strcpy(palavras[controle], ""); // Destrói a palavra
+                        if (alvo == controle) { alvo = -1; letra = 0; } // Solta o alvo
+
+                        dano(alvo, coordX, coordY, score, onda, vidas, palavras);
+
+                        if (vidas <= 0) break; // Sai do for se morreu
+                    }
+                }
+            }
+
+            if(vidas <= 0) break; // Sai do while(1) se morreu
+
+            // LÓGICA DE DIGITAÇÃO (TIROS)
+            if (kbhit()) {
+                input = getch();
+
+                if (input == 27) {
+                    // Aqui você pode colocar uma tela de pause depois
+                }
+
+                if (alvo == -1) {
+                    // PROCURANDO ALVO (Checa a primeira letra)
+                    for (controle = 0; controle < quantidade; controle++) {
+                        if (strlen(palavras[controle]) > 0 && coordY[controle] >= 0) {
+                            if (input == palavras[controle][0]) {
+                                // Apaga a primeira letra visualmente
+                                gotoxy(coordX[controle], coordY[controle]);
+                                printf(" ");
+                                palavras[controle][0] = ' ';
+                                alvo = controle;
+                                letra = 1;
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    // ATIRANDO NO ALVO ATUAL (Checa as próximas letras)
+                    if (input == palavras[alvo][letra]) {
+                        // Apaga a letra que acabou de acertar
+                        gotoxy(coordX[alvo] + letra, coordY[alvo]);
+                        printf(" ");
+                        palavras[alvo][letra] = ' ';
+                        letra++;
+
+                        // Se completou a palavra
+                        if (letra == strlen(palavras[alvo])) {
+                            // Apaga o rastro dela na tela
+                            gotoxy(coordX[alvo], coordY[alvo]);
+                            for(int i = 0; i < letra; i++) { printf(" "); }
+
+                            strcpy(palavras[alvo], ""); // Destrói a palavra
+                            alvo = -1;
+                            letra = 0;
+                            score += (10 * strlen(palavras_dicio[0])); // Ganha pontos
+
+                            // Checa se passou de onda
+                            int palavras_restantes = 0;
+                            for (int i = 0; i < quantidade; i++) {
+                                if (strlen(palavras[i]) > 0) {
+                                    palavras_restantes++;
+                                }
+                            }
+                            if (palavras_restantes == 0) {
+                                alvo = -2; // Sinal de passar de onda
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Se o sinal de passar de onda foi ativado
+            if (alvo == -2) {
+                onda++;
+                alvo = -1;
+                letra = 0;
+                break; // Sai do while(1) e recomeça a próxima onda no setup
+            }
+        }
+    }
+
+    // TELA DE GAME OVER
+    system("cls");
+    gotoxy(info.dwSize.X / 2 - 5, info.dwSize.Y / 2);
+    textcolor(VERMELHO_CLARO);
+    printf("GAME OVER");
+    textcolor(PADRAO);
+
+    gotoxy(info.dwSize.X / 2 - 10, info.dwSize.Y / 2 + 1);
+    printf("SCORE FINAL: %d", score);
+
+    gotoxy(info.dwSize.X / 2 - 15, info.dwSize.Y / 2 + 3);
+    printf("Pressione qualquer tecla para sair...");
+
+    getch(); // Espera jogador apertar algo para fechar
+    return 0;
+}
