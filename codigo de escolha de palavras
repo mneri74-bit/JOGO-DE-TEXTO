@@ -1,23 +1,30 @@
+static const char *palavras_dicio[] = {
+    "abobora", "acontecimento", "aeronave", "arquitetura", "astronauta",
+    "borboleta", "civilizacao", "computador", "conhecimento", "constelacao",
+    "descoberta", "eletricidade", "engenharia", "experiencia", "felicidade",
+    "gravidade", "imaginacao", "independencia", "labirintico", "matematica"
+};
+#define NUM_PALAVRAS (sizeof(palavras_dicio) / sizeof(palavras_dicio[0]))
 
 
 
 
 void sorteio_palavras(int onda, char palavras[][50]) {
     int indice;
-    int usado[NUM_DIFICIL] = {0};
+    int usado[NUM_PALAVRAS] = {0};
 
     // Limite de segurança para não travar o jogo se a onda for maior que o dicionário
     int quantidade = onda;
-    if (quantidade > NUM_DIFICIL) {
-        quantidade = NUM_DIFICIL;
+    if (quantidade > NUM_PALAVRAS) {
+        quantidade = NUM_PALAVRAS;
     }
 
     for (int i = 0; i < quantidade; i++) {
         do {
-            indice = rand() % NUM_DIFICIL;
+            indice = rand() % NUM_PALAVRAS;
         } while (usado[indice]);
 
         usado[indice] = 1;
-        strcpy(palavras[i], palavras_dificil[indice]);
+        strcpy(palavras[i], palavras_dicio[indice]);
     }
 }
