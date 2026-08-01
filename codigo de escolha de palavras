@@ -1,8 +1,29 @@
 static const char *palavras_dicio[] = {
-    "abobora", "acontecimento", "aeronave", "arquitetura", "astronauta",
-    "borboleta", "civilizacao", "computador", "conhecimento", "constelacao",
-    "descoberta", "eletricidade", "engenharia", "experiencia", "felicidade",
-    "gravidade", "imaginacao", "independencia", "labirintico", "matematica"
+ "abobora", "acontecimento", "aeronave", "arquitetura", "astronauta",
+"borboleta", "civilizacao", "computador", "conhecimento", "constelacao",
+"descoberta", "eletricidade", "engenharia", "experiencia", "felicidade",
+"gravidade", "imaginacao", "independencia", "labirintico", "matematica",
+"abacateiro", "adaptabilidade", "administracao", "alimentacao", "amizade",
+"anfibio", "antiguidade", "aprendizagem", "armazenamento", "articulacao",
+"atmosfera", "automovel", "aventureiro", "biblioteca", "biologia",
+"biotecnologia", "brilhante", "caligrafia", "caminhoneiro", "camuflagem",
+"caracteristica", "cartografia", "celebracao", "cientifico", "circunferencia",
+"classificacao", "coletividade", "colaboracao", "combustivel", "comemoracao",
+"comportamento", "compreensao", "comunicacao", "concentracao", "configuracao",
+"confiabilidade", "congelamento", "conscientizacao", "conservacao", "construcao",
+"contabilidade", "contaminacao", "cooperacao", "coordenacao", "criatividade",
+"curiosidade", "demonstracao", "desempenho", "desenvolvimento", "deslocamento",
+"desmatamento", "determinacao", "digitalizacao", "dinamometro", "diversidade",
+"documentacao", "ecossistema", "economia", "educacao", "eletronica",
+"empreendedor", "empreendimento", "enciclopedia", "engenhosidade", "equipamento",
+"escolaridade", "especializacao", "estabilidade", "estacionamento", "estrategia",
+"estrutura", "experimentacao", "extraordinario", "ferramenta", "fotografia",
+"fotossintese", "funcionamento", "fundamentacao", "gasoduto", "geografia",
+"geometria", "hidreletrica", "hidrodinamica", "identificacao", "iluminacao",
+"industrializacao", "informatica", "infraestrutura", "inovacao", "instrumentacao",
+"inteligencia", "interdisciplinar", "laboratorio", "manufatura", "meteorologia",
+"microprocessador", "monitoramento", "oportunidade", "organizacao", "processamento",
+"programacao", "responsabilidade", "sustentabilidade", "tecnologia", "universidade"
 };
 #define NUM_PALAVRAS (sizeof(palavras_dicio) / sizeof(palavras_dicio[0]))
 
