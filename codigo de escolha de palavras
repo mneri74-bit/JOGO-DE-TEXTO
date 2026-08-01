@@ -1,0 +1,23 @@
+
+
+
+
+void sorteio_palavras(int onda, char palavras[][50]) {
+    int indice;
+    int usado[NUM_DIFICIL] = {0};
+
+    // Limite de segurança para não travar o jogo se a onda for maior que o dicionário
+    int quantidade = onda;
+    if (quantidade > NUM_DIFICIL) {
+        quantidade = NUM_DIFICIL;
+    }
+
+    for (int i = 0; i < quantidade; i++) {
+        do {
+            indice = rand() % NUM_DIFICIL;
+        } while (usado[indice]);
+
+        usado[indice] = 1;
+        strcpy(palavras[i], palavras_dificil[indice]);
+    }
+}
