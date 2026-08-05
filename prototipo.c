@@ -116,12 +116,12 @@ if (onda > NUM_PALAVRAS) {
         gotoxy(meiox - 3, meioy);
         textcolor(VERMELHO_ESCURO);
         printf("ONDA %d", onda);
-        Sleep(400);
+        Sleep(500);
 
         gotoxy(meiox - 3, meioy);
         textcolor(VERMELHO_CLARO);
         printf("onda %d", onda);
-        Sleep(400);
+        Sleep(500);
     }
     textcolor(PADRAO);
     gotoxy(meiox - 3, meioy);
@@ -154,23 +154,22 @@ void placar(int display, int score, int onda, int vidas) {
     gotoxy(info.dwSize.X - 15, info.dwSize.Y - 1);
     for (int i = 0; i < 3; i++) {
         if(i < vidas) printf("<3 ");
-        else printf("   "); // Apaga corações perdidos
+        else {printf("   ");} // Apaga corações perdidos
     }
     textcolor(PADRAO);
 }
 
 void dano(int alvo, int x[], int y[], int score, int onda, int vidas, char palavras[26][50]) {
     // Pisca a tela em vermelho
-    for (int i = 0; i < 2; i++) {
+    /*for (int i = 0; i < 2; i++) {
         system("color 44");
-        Sleep(100);
-        system("color 07"); // Volta ao normal
-        Sleep(100);
-    }
+        Sleep(200);
+        system("color CC");
+        Sleep(200);
+        system("color FF");
+        Sleep(200);}*/
     system("color 07");
-
-    system("cls"); // Força atualização da tela
-
+    //system("cls"); 
     // Redesenha as palavras restantes
     for (int controle = 0; controle < onda; controle++) {
         if(strlen(palavras[controle]) > 0 && y[controle] >= 0){
@@ -204,6 +203,7 @@ int main() {
     int coordX[26];
     int coordY[26];
     int controle = 0;
+    int palavras_restantes = 0;
 
     HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_SCREEN_BUFFER_INFO info;
@@ -231,7 +231,7 @@ int main() {
                 timer = tempo;
 
                 for (controle = 0; controle < quantidade; controle++) {
-                    if (strlen(palavras[controle]) == 0) continue; // Pula palavra destruída
+                    if (strlen(palavras[controle]) == 0) {continue;} // Pula palavra destruída
 
                     if (coordY[controle] < info.dwSize.Y - 3) {
                         // Apaga a palavra na posição antiga
@@ -257,7 +257,17 @@ int main() {
 
                         dano(alvo, coordX, coordY, score, onda, vidas, palavras);
 
-                        if (vidas <= 0) break; // Sai do for se morreu
+                        if (vidas <= 0) {break;} // Sai do for se morreu
+
+                        palavras_restantes = 0;
+                            for (int i = 0; i < quantidade; i++) {
+                                if (strlen(palavras[i]) > 0) {
+                                    palavras_restantes++;
+                                }
+                            }
+                            if (palavras_restantes == 0) {
+                                alvo = -2; // Sinal de passar de onda
+                            }
                     }
                 }
             }
@@ -308,7 +318,7 @@ int main() {
                             score += (10 * strlen(palavras_dicio[0])); // Ganha pontos
 
                             // Checa se passou de onda
-                            int palavras_restantes = 0;
+                            palavras_restantes = 0;
                             for (int i = 0; i < quantidade; i++) {
                                 if (strlen(palavras[i]) > 0) {
                                     palavras_restantes++;
@@ -348,3 +358,4 @@ int main() {
     getch(); // Espera jogador apertar algo para fechar
     return 0;
 }
+;
